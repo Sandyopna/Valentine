@@ -1,0 +1,214 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Be My Valentine ❤️</title>
+
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background: linear-gradient(135deg, #ffb6c1, #ffc0cb);
+      font-family: Arial, sans-serif;
+    }
+
+    canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      z-index: 0;
+    }
+
+    .container {
+      text-align: center;
+      padding: 20px;
+      z-index: 2;
+    }
+
+    h1 {
+      color: #b30059;
+      font-size: clamp(32px, 6vw, 52px);
+      margin-bottom: 30px;
+    }
+
+    .wiggle {
+      display: inline-block;
+      animation: wiggle 2s infinite;
+    }
+
+    @keyframes wiggle {
+      0%,100% { transform: rotate(0deg); }
+      25% { transform: rotate(4deg); }
+      75% { transform: rotate(-4deg); }
+    }
+
+    button {
+      border: none;
+      border-radius: 20px;
+      cursor: pointer;
+      margin: 15px;
+      transition: transform 0.2s ease;
+    }
+
+    button:hover {
+      animation: bounce 0.4s;
+    }
+
+    @keyframes bounce {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+
+    #yesBtn {
+      padding: 22px 44px;
+      font-size: clamp(22px, 4vw, 30px);
+      background-color: #ff4d88;
+      color: white;
+    }
+
+    #noBtn {
+      padding: 16px 32px;
+      font-size: clamp(18px, 3.5vw, 24px);
+      background-color: #666;
+      color: white;
+      position: absolute;
+    }
+
+    #result {
+      display: none;
+    }
+
+    img {
+      width: clamp(220px, 60vw, 320px);
+      border-radius: 25px;
+      margin-top: 25px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+      z-index: 2;
+      position: relative;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="confetti"></canvas>
+<canvas id="fireworks"></canvas>
+
+<div class="container" id="questionBox">
+  <h1>
+    Will you be my Valentine Binu?
+    <span class="wiggle">💖</span>
+    <span class="wiggle">💘</span>
+  </h1>
+  <button id="yesBtn">Yes ❤️</button>
+  <button id="noBtn">No 💔</button>
+</div>
+
+<div class="container" id="result">
+  <h1>
+    Congratulations!!!
+    <span class="wiggle">🎉</span>
+    <span class="wiggle">💞</span>
+  </h1>
+  <p style="font-size: clamp(18px, 4vw, 24px); color:#800040;">
+    You’re officially my Valentine ❤️
+  </p>
+  <img src="photo_2026-02-02_20-02-49.jpg" alt="Us together">
+</div>
+
+<script>
+/* NO BUTTON RUNS AWAY */
+const noBtn = document.getElementById("noBtn");
+noBtn.addEventListener("mouseover", () => {
+  noBtn.style.left = Math.random() * (window.innerWidth - 120) + "px";
+  noBtn.style.top = Math.random() * (window.innerHeight - 60) + "px";
+});
+
+/* CONFETTI */
+const confettiCanvas = document.getElementById("confetti");
+const ctx = confettiCanvas.getContext("2d");
+confettiCanvas.width = window.innerWidth;
+confettiCanvas.height = window.innerHeight;
+
+let confetti = [];
+function launchConfetti() {
+  for (let i = 0; i < 200; i++) {
+    confetti.push({
+      x: window.innerWidth / 2,
+      y: window.innerHeight / 2,
+      r: Math.random() * 6 + 4,
+      dx: Math.random() * 10 - 5,
+      dy: Math.random() * -10 - 5,
+      color: `hsl(${Math.random() * 360}, 100%, 60%)`
+    });
+  }
+}
+
+function drawConfetti() {
+  ctx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+  confetti.forEach((p, i) => {
+    ctx.beginPath();
+    ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+    ctx.fillStyle = p.color;
+    ctx.fill();
+    p.x += p.dx;
+    p.y += p.dy;
+    p.dy += 0.3;
+    if (p.y > window.innerHeight) confetti.splice(i, 1);
+  });
+  requestAnimationFrame(drawConfetti);
+}
+
+/* FIREWORKS */
+const fwCanvas = document.getElementById("fireworks");
+const fctx = fwCanvas.getContext("2d");
+fwCanvas.width = window.innerWidth;
+fwCanvas.height = window.innerHeight;
+
+let fireworks = [];
+
+function launchFirework() {
+  const x = Math.random() * fwCanvas.width;
+  const y = Math.random() * fwCanvas.height / 2;
+  for (let i = 0; i < 50; i++) {
+    fireworks.push({
+      x, y,
+      dx: Math.random() * 6 - 3,
+      dy: Math.random() * 6 - 3,
+      life: 60,
+      color: `hsl(${Math.random() * 360}, 100%, 60%)`
+    });
+  }
+}
+
+function drawFireworks() {
+  fctx.clearRect(0, 0, fwCanvas.width, fwCanvas.height);
+  fireworks.forEach((p, i) => {
+    fctx.fillStyle = p.color;
+    fctx.fillRect(p.x, p.y, 3, 3);
+    p.x += p.dx;
+    p.y += p.dy;
+    p.life--;
+    if (p.life <= 0) fireworks.splice(i, 1);
+  });
+  requestAnimationFrame(drawFireworks);
+}
+
+/* YES BUTTON */
+document.getElementById("yesBtn").addEventListener("click", () => {
+  document.getElementById("questionBox").style.display = "none";
+  document.getElementById("result").style.display = "block";
+  launchConfetti();
+  setInterval(launchFirework, 700);
+  drawConfetti();
+  drawFireworks();
+});
+</script>
+
+</body>
+</html>
